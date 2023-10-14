@@ -15,10 +15,16 @@ public abstract class Evenement {
 
   public abstract void enregistreEvenement(Agenda agendaUnAn);
 
-  public abstract void supprimeElement();
+  public abstract void supprimeElement(Agenda agendaUnAn);
   
   public String toString(){
-    return "a";
+    String str = "*********** Evenement " + this.getTitre() + " **************\n";
+    str+= "Identifiant: " + this.getNumero();
+    str+= "\nJour: " + this.getJour();
+    str+= "\nDébut: " + this.getHDeb();
+    str+= "\nFin: " + this.getHFin();
+    str+= "\nLieu: " + this.getLieu();
+    return str;
   }
 
   public int getJour(){

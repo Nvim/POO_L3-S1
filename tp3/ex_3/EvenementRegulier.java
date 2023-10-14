@@ -11,12 +11,31 @@ public class EvenementRegulier extends Evenement{
 
   @Override
   public void enregistreEvenement(Agenda agendaUnAn){
-    agendaUnAn.creerEvenementRegulier(getJour(), getHDeb(), getHFin(), getLieu(), getTitre(), periode, nbreFois);
+    try {
+      agendaUnAn.creerEvenementRegulier(getJour(), getHDeb(), getHFin(), getLieu(), getTitre(), periode, nbreFois);
+    } catch (Exception e) {
+      System.err.println("Impossible d'ajouter l'evenement '" + this.getTitre() + "':");
+      System.err.println(e.getMessage());
+    }
   }
 
   @Override
-  public void supprimeElement(){
-    System.out.println("caca");
+  public void supprimeElement(Agenda agendaUnAn){
+    try {
+      agendaUnAn.supprimeEvt(this.getNumero());
+    } catch (Exception e) {
+      System.err.println("Impossible d'ajouter l'evenement '" + this.getTitre() + "':");
+      System.err.println(e.getMessage());
+    }
   }
 
+  @Override
+  public String toString(){
+    String str = super.toString();
+    str += "\nType d'evenement: Regulier";
+    str += "\nNombre de répetitions: " + nbreFois;
+    str += "\nPériode: " + periode;
+    str += "\n **********************************\n";
+    return str;
+  }
 }
