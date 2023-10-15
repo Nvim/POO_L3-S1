@@ -20,12 +20,15 @@ public class Agenda {
   
   @Override
   public String toString(){
-    String str = "\t*** Agenda de " + prenomProprietaire + nomProprietaire + "pour l'année " + annee + " ***\n\n";
+    String str = "\t*** Agenda de " + prenomProprietaire + " " + nomProprietaire + "pour l'année " + annee + " ***\n\n";
     for(int i = 0; i<nbEvt; i++){
-      str += evenements[i].toString();
+      if(evenements[i] != null){ // un evenement peut avoir été supprimé, ce qui laisse un trou
+        str += evenements[i].toString();
+      }
     }
     return str;
   }
+
   // vérifie qu'il n'y a aucun evenement enregistré entre heureDebut et heureFin
   // retroune true si le créneau est dispo, false sinon
   private boolean verifierDispo(int jour, int heureDebut, int heureFin){
@@ -65,6 +68,7 @@ public class Agenda {
     throw new Exception("Erreur: le tableau d'evenements est plein. Impossible d'ajouter de nouveaux evenements");
   }
 
+  // ajoute l'evenement au tableau des horaires
   private void addEvtToPlageHoraire(Evenement e){
     for(int i = e.getHDeb(); i < e.getHFin(); i++){
       horaires[e.getJour()][i] = e.getNumero();
@@ -73,9 +77,15 @@ public class Agenda {
 
   // supprime l'evenement du tableau d'evenements
   private void supprimeEvtToTabEvt(Evenement e){
-    for(Evenement x : evenements){
-      if(x.getNumero() == e.getNumero()){
-        x = null;
+    // for(Evenement x : evenements){
+    //   if(x.getNumero() == e.getNumero()){
+    //     x = null;
+    //     return;
+    //   }
+    // }
+    for(int i = 0; i<nbEvt; i++){
+      if(evenements[i].getNumero() == e.getNumero()){
+        evenements[i] = null;
         return;
       }
     }
@@ -104,8 +114,9 @@ public class Agenda {
       System.out.println("ERREUR supprimeEvt: e est nul alors qu'il devrait etre présent dans l'agenda.");
       return;
     }
-    supprimeEvtToTabEvt(e);
+    System.out.println("Suppression de l'evenement " + numEvt + "!");
     supprimeEvtToPlageHoraire(e);
+    supprimeEvtToTabEvt(e);
   }
 
   public void creerEvenementPonctuel(int jour, int heureDebut, int heureFin, String lieu, String titre) throws Exception{
@@ -120,50 +131,54 @@ public class Agenda {
     addEvtToTabEvt(e); // ajout de l'évenement à la liste d'evenements
   }
 
-  public void creerEvenementRegulier(int jour, int heureDebut, int heureFin, String lieu, String titre, int periode, int nbrFois) throws Exception{
-    
-    int i = 0; //i compteur
-    int jourTemp = jour; //jour auquel on en est
-    int vraiNbrFois = 0; //nombre de fois ou on doit vraiment ajouter l'evt (sans depasser de l'annee)
-    boolean dispo;
+  private int getVraiNbrFois(int jourDebut, int periode, int nbrFois){
+    int i = 0;
+    int jourTemp = jourDebut;
+    int vraiNbrFois = 0;
 
-    // calcul de vraiNbrFois
-    while(i < nbrFois){
-      jourTemp +=periode;
+    if(jourDebut < 366){
+      vraiNbrFois = 1;
+      i=1;
+    }
+
+    while (i < nbrFois){
+      jourTemp += periode;
       if(jourTemp>365){
         System.err.println("Attention: l'evenement régulier depasse de l'année! (jour:" + jourTemp + ")");
       }
-      else{ 
-        vraiNbrFois++; 
+      else{
+        vraiNbrFois++;
       }
       i++;
     }
+    return vraiNbrFois;
+  }
 
+  public void creerEvenementRegulier(int jour, int heureDebut, int heureFin, String lieu, String titre, int periode, int nbrFois) throws Exception{
+    
+    boolean dispo;
+    int vraiNbrFois = getVraiNbrFois(jour, periode, nbrFois); //nombre de fois ou on doit vraiment ajouter l'evt (sans depasser de l'annee)
     if(vraiNbrFois != nbrFois){
       System.out.println("L'évenemnt régulier '" + titre + "' sera ajouté que " + vraiNbrFois + " fois. (Prévu: " + nbrFois + " fois)");
     }
 
-    //pour chaque jour (incrémenté par période) dans l'année:
-    for(i = jour; i<vraiNbrFois; i+=periode){
-      
-      Evenement e = new EvenementPonctuel(i, heureDebut, heureFin, lieu, titre);
-      dispo = verifierDispo(i, heureDebut, heureFin);
-      
+    int i = 0;
+    int jourTemp = jour;
+    while(i<vraiNbrFois){
+      Evenement e = new EvenementPonctuel(jourTemp, heureDebut, heureFin, lieu, titre);
+      dispo = verifierDispo(jourTemp, heureDebut, heureFin);
+
       if(!dispo){
         throw new Exception("Erreur, lors de la création de l'évenement régulier '" + titre + "', pour le jour " + i + 
           ", un autre évenement est déjà prévu à cette date.");
       }
 
-      // si le jour est dispo, on l'ajoute
       if(dispo){
-        // for(int j = heureDebut; j<heureFin; j++){
-        //   horaires[i][j] = e.getNumero(); //i = le jour, j = l'heure
-        // }
-        // evenements[nbEvt] = e;
-        // nbEvt++;
-        addEvtToPlageHoraire(e);
         addEvtToTabEvt(e);
+        addEvtToPlageHoraire(e);
       }
+      i++;
+      jourTemp += periode;
     }
   }
 

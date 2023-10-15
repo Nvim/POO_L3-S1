@@ -19,7 +19,7 @@ public class EvenementPonctuel extends Evenement{
     try {
       agendaUnAn.supprimeEvt(this.getNumero());
     } catch (Exception e) {
-      System.err.println("Impossible d'ajouter l'evenement '" + this.getTitre() + "':");
+      System.err.println("Impossible de supprimer l'evenement '" + this.getTitre() + "':");
       System.err.println(e.getMessage());
     }
   }

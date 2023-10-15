@@ -1,7 +1,7 @@
 public abstract class Evenement {
 
-  private int jour, hDeb, hFin, nbEvt;
-  private static int numero = 0;
+  private int jour, hDeb, hFin, numero;
+  private static int nbEvt = 0;
   private String lieu, titre;
 
   public Evenement(int jour, int heureDebut, int heureFin, String lieu, String titre){
@@ -10,7 +10,8 @@ public abstract class Evenement {
     this.hFin = heureFin;
     this.lieu = lieu;
     this.titre = titre;
-    numero++;
+    nbEvt++;
+    this.numero = nbEvt;
   }
 
   public abstract void enregistreEvenement(Agenda agendaUnAn);
@@ -49,5 +50,9 @@ public abstract class Evenement {
 
   public int getNumero(){
     return numero;
+  }
+
+  public int getNbEvt(){
+    return nbEvt;
   }
 }
